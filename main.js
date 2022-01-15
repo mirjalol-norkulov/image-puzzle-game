@@ -53,7 +53,7 @@ function generateImages() {
   let images = shuffleArray(IMAGES);
 
   // Divide into chunks, make 2 dimensional array
-  images = chunkArray(images);
+  images = chunkArray(images, BOARD_SIZE);
 
   // Make last item empty
   images[BOARD_SIZE - 1][BOARD_SIZE - 1] = {
