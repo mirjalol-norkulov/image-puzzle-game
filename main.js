@@ -34,22 +34,27 @@ function isCellEmpty(images, row, col) {
   return images[row][col].empty === true;
 }
 
-const BOARD_SIZE = 3;
-const ROW_BEGIN = 0;
-const COL_BEGIN = 0;
-const ROW_END = BOARD_SIZE - 1;
-const COL_END = BOARD_SIZE - 1;
+const BOARD_SIZE = 3; // Size of the board
+const ROW_BEGIN = 0; // Beginning of the row
+const COL_BEGIN = 0; // Beginning of the column
+const ROW_END = BOARD_SIZE - 1; // End of the row
+const COL_END = BOARD_SIZE - 1; // End of the column
 
 function generateImages() {
   const IMAGES = Array.from(Array(BOARD_SIZE * BOARD_SIZE - 1).keys()).map(
     (num, index) => ({
       source: `./images/${num + 1}.jpg`,
-      order: num + 1,
-      transform: [0, 0],
+      order: num + 1, // for checking the order of images and determine if user won the game
+      transform: [0, 0], // for calculating next values of the transformations. This is for animation
     })
   );
 
-  let images = chunkArray(shuffleArray(IMAGES), BOARD_SIZE);
+  // Shuffle images
+  let images = shuffleArray(IMAGES);
+
+  // Divide into chunks, make 2 dimensional array
+  images = chunkArray(images);
+
   // Make last item empty
   images[BOARD_SIZE - 1][BOARD_SIZE - 1] = {
     empty: true,
@@ -64,6 +69,7 @@ function generateImages() {
   return images;
 }
 
+// Render images in the browser
 function renderImages(images, board) {
   board.innerHTML = "";
   images.forEach((row) => {
@@ -85,6 +91,7 @@ function renderImages(images, board) {
 }
 
 let gameEnded = false;
+
 let images = generateImages();
 
 const board = document.getElementById("js-board");
@@ -103,6 +110,7 @@ function onCellClick(event) {
   if (gameEnded) {
     return;
   }
+
   const row = Number(event.target.dataset.row);
   const col = Number(event.target.dataset.col);
 
@@ -123,12 +131,16 @@ function onCellClick(event) {
   }
 
   if (hasWonGame(images)) {
+    // When transition animation ends, load last part of the image into board and make some animations
     event.target.addEventListener(
       "transitionend",
       () => {
+        // Append last part of the image to the board
         const lastImg = document.createElement("img");
         lastImg.src = `/images/${BOARD_SIZE * BOARD_SIZE}.jpg`;
         board.appendChild(lastImg);
+
+        // Add winning animation to the board
         board.classList.add("board--won-game");
         gameEnded = true;
       },
@@ -141,13 +153,20 @@ function onCellClick(event) {
 function swapCells(row1, col1, row2, col2, element) {
   const image = images[row1][col1];
 
+  // Calculate x and y transform values
   const transformX = image.transform[0] + (col2 - col1) * element.offsetWidth;
   const transformY = image.transform[1] + (row2 - row1) * element.offsetWidth;
+
   element.style.transform = `translate(${transformX}px, ${transformY}px)`;
+
+  // Update data attributes of the image. Because we are keeping row and column data there.
   element.dataset.row = row2;
   element.dataset.col = col2;
+
+  // Keep latest transform values in the image data for future calculations
   image.transform = [transformX, transformY];
 
+  // Swap image with empty cell in the images 2 dimensional array.
   images[row1][col1] = { empty: true, order: BOARD_SIZE * BOARD_SIZE };
   images[row2][col2] = image;
 }
