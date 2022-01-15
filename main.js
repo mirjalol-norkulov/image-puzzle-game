@@ -88,10 +88,10 @@ let gameEnded = false;
 let images = generateImages();
 
 const board = document.getElementById("js-board");
-const restartBtn = document.getElementById("js-restart");
 
 renderImages(images, board);
 
+const restartBtn = document.getElementById("js-restart");
 restartBtn.addEventListener("click", () => {
   gameEnded = false;
   images = generateImages();
