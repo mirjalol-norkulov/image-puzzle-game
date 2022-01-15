@@ -18,7 +18,7 @@ function shuffleArray(array) {
   return array;
 }
 
-function hasWonGame() {
+function hasWonGame(images) {
   for (let i = 0; i < images.length; i++) {
     for (let j = 1; j < images[i].length; j++) {
       if (images[i][j].order - images[i][j - 1].order !== 1) {
@@ -30,7 +30,7 @@ function hasWonGame() {
   return true;
 }
 
-function isCellEmpty(row, col) {
+function isCellEmpty(images, row, col) {
   return images[row][col].empty === true;
 }
 
@@ -98,6 +98,7 @@ restartBtn.addEventListener("click", () => {
   renderImages(images, board);
 });
 
+// Click listener for cells
 function onCellClick(event) {
   if (gameEnded) {
     return;
@@ -105,23 +106,23 @@ function onCellClick(event) {
   const row = Number(event.target.dataset.row);
   const col = Number(event.target.dataset.col);
 
-  if (row !== ROW_END && isCellEmpty(row + 1, col)) {
+  if (row !== ROW_END && isCellEmpty(images, row + 1, col)) {
     swapCells(row, col, row + 1, col, event.target);
   }
 
-  if (row !== ROW_BEGIN && isCellEmpty(row - 1, col)) {
+  if (row !== ROW_BEGIN && isCellEmpty(images, row - 1, col)) {
     swapCells(row, col, row - 1, col, event.target);
   }
 
-  if (col !== COL_END && isCellEmpty(row, col + 1)) {
+  if (col !== COL_END && isCellEmpty(images, row, col + 1)) {
     swapCells(row, col, row, col + 1, event.target);
   }
 
-  if (col !== COL_BEGIN && isCellEmpty(row, col - 1)) {
+  if (col !== COL_BEGIN && isCellEmpty(images, row, col - 1)) {
     swapCells(row, col, row, col - 1, event.target);
   }
 
-  if (hasWonGame()) {
+  if (hasWonGame(images)) {
     event.target.addEventListener(
       "transitionend",
       () => {
